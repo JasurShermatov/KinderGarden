@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from src.config.settings import get_settings, Settings
+from src.init import init
 from src.routers import api_v1_router
 from src.websockets import api_v1_websocket
 
@@ -15,6 +16,7 @@ async def lifespan(app: FastAPI):
 
 
 def create_app() -> CORSMiddleware:
+    init()
 
     app = FastAPI(
         title=settings.PROJECT_NAME,

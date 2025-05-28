@@ -40,8 +40,7 @@ class UserOTPService:
     async def create_user_otp(self, user_id: int, otp_code: int) -> UserOTP:
         """Creates a new OTP record for a given user."""
         await self._get_user_or_404(user_id)  # Ensure user exists
-        # Consider deleting previous OTPs for the user before creating a new one
-        # await self.delete_user_otps(user_id)
+        await self.delete_user_otps(user_id)
         try:
             user_otp = await self.__user_otp_repository.create_user_otp(
                 user_id=user_id, otp_code=otp_code
@@ -52,7 +51,7 @@ class UserOTPService:
             logger.error(f"Error creating OTP for user ID {user_id}: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Could not create OTP.",
+                detail="Could not create OTP. ",
             )
 
     async def get_valid_user_otp(self, user_id: int) -> UserOTP | None:

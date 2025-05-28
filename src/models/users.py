@@ -3,21 +3,16 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, List
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, func, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-# Updated import for the new structure
 from src.database.base_model import BaseModel
 
-# Use TYPE_CHECKING to avoid circular imports during runtime
 if TYPE_CHECKING:
-    from .meals import MealLog  # Adjusted import path
-
-    # Assuming UserOTP is still in this file, otherwise adjust path
+    from .meals import MealLog
 
 
 class Role(BaseModel):
-    """Represents a user role in the system (e.g., admin, user)."""
 
     __tablename__ = "roles"
 
@@ -117,8 +112,8 @@ class UserOTP(BaseModel):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    otp_code: Mapped[str] = mapped_column(
-        String(10), nullable=False
+    otp_code: Mapped[int] = mapped_column(
+        Integer, nullable=False
     )  # Store OTP as string if needed
     # Use server_default for dynamic defaults like current time + delta
     expires_at: Mapped[datetime.datetime] = mapped_column(

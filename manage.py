@@ -11,6 +11,14 @@ from src.utils.security import security
 
 app = Typer()
 
+def get_event_loop():
+    try:
+        return asyncio.get_event_loop()
+    except RuntimeError as e:
+        if "There is no current event loop in thread" in str(e):
+            return asyncio.new_event_loop()
+        raise e
+
 
 async def check_superuser_exists(email: str) -> bool:
     async with get_standalone_session() as session:
@@ -78,7 +86,9 @@ def createsuperuser():
     echo(style("\nSuperuser created successfully!", fg=typer.colors.GREEN, bold=True))
     echo(style(f"Name: {first_name} {last_name}", fg=typer.colors.BLUE))
     echo(style(f"Email: {email}", fg=typer.colors.BLUE))
-    asyncio.run(create_superuser(first_name, last_name, email, password))
+    event_loop = get_event_loop()
+    event_loop.run_until_complete(create_superuser(first_name, last_name, email, password))
+
 
 
 @app.command(help="See all superusers.")
@@ -90,7 +100,8 @@ def allsuperusers():
             )
             return result.scalars().all()
 
-    superusers = asyncio.run(fetch_superusers())
+    event_loop = get_event_loop()
+    superusers = event_loop.run_until_complete(fetch_superusers())
     if not superusers:
         echo(style("No superusers found.", fg=typer.colors.YELLOW, bold=True))
     else:

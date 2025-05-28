@@ -58,10 +58,9 @@ class AuthenticationService:
         await self._validate_user_input(payload)
 
         hashed_password = self.__security.hash_password(payload.password)
-        user_data_to_create = payload.model_dump()
-        user_data_to_create["password"] = hashed_password
+        payload.password = hashed_password
 
-        new_user = await self.__user_repository.register_user(user_data_to_create)
+        new_user = await self.__user_repository.register_user(payload)
 
         otp_code = self.__security.generate_otp()
         await self.__user_otp_service.create_user_otp(new_user.id, otp_code)
@@ -71,7 +70,6 @@ class AuthenticationService:
         return UserReadSchema.model_validate(new_user)
 
     async def confirm_otp(self, payload: UserConfirmationSchema) -> UserReadSchema:
-        """Confirms user registration using the provided OTP."""
         user = await self.__user_repository.get_user_by_email(payload.email)
         if not user:
             raise HTTPException(
