@@ -1,0 +1,122 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app:delegated
+    ports:
+      - "8000:8000" # Use env var for host port, default 8000
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network
+    # Assuming run.sh handles migrations and starts uvicorn with src.app:app
+    command: sh -c "./run.sh"
+    restart: on-failure
+    healthcheck:
+      # Healthcheck needs to point to a valid endpoint, e.g., a health check route
+      # Assuming a /health endpoint exists or will be added in src.app
+      test: [ "CMD-SHELL", "curl -fs http://localhost:8000/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes:
+      - .:/app:delegated
+    env_file:
+      - .env
+    # PYTHONPATH=/app should work with src layout if commands use src.* imports
+    environment:
+      - PYTHONPATH=/app
+    # Update Celery app path to src.tasks.celery_app
+    command: >
+      sh -c "python -m celery -A src.tasks.celery_app worker -l INFO --concurrency=2"
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - app-network
+    restart: on-failure
+    healthcheck:
+      # Update Celery app path for healthcheck
+      test: >
+        sh -c "python -m celery -A src.tasks.celery_app inspect ping || exit 1"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  postgres:
+    image: postgres:16-alpine # Using Postgres 16 as 17 is not LTS
+    restart: on-failure
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # Use env var for host port, default 5432
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  redis:
+    image: redis:7-alpine # Using Redis 7 as 8 is not LTS
+    restart: on-failure
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379" # Use env var for host port, default 6379
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+volumes:
+  db_data:
+  redis_data:
+
+networks:
+  app-network:
+    driver: bridge
+
