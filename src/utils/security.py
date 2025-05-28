@@ -129,6 +129,7 @@ class Security:
     def generate_otp() -> int:
         return randbelow(10**6)
 
+
 jwt_handler = JWTHandler()
 security = Security()
 

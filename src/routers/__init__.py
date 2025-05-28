@@ -10,6 +10,7 @@ from .position_calculation_router import (
     router as position_calculation_router,
 )
 from .report_router import router as report_router
+
 api_v1_router = APIRouter()
 
 api_v1_router.include_router(auth_router, tags=["Authentication"])
@@ -18,9 +19,7 @@ api_v1_router.include_router(meal_router, tags=["Meals"])
 api_v1_router.include_router(ingredients_router, tags=["Ingredients"])
 api_v1_router.include_router(units_router, tags=["Units"])
 api_v1_router.include_router(alerts_router, tags=["Alerts"])
-api_v1_router.include_router(
-    position_calculation_router, tags=["Position Calculation"]
-)
+api_v1_router.include_router(position_calculation_router, tags=["Position Calculation"])
 api_v1_router.include_router(report_router, tags=["Reports"])
 
 

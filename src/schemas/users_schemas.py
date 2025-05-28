@@ -26,7 +26,6 @@ class UserCreateSchema(UserBaseSchema):
     model_config = ConfigDict(from_attributes=True)
 
 
-
 class UserUpdateSchema(BaseModel):
     first_name: str | None = Field(None, max_length=100)
     last_name: str | None = Field(None, max_length=100)
