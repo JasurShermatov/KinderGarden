@@ -103,7 +103,7 @@ EMAIL_TEMPLATE_FOR_CODE = """<!DOCTYPE html>
 
         <div class="footer">
             <p>This is an automated message. Please do not reply.</p>
-            <p>&copy; 2024 <a href="shaxzodbek.com">Shaxzodbek </a>. All rights reserved.</p>
+            <p>&copy; 2024 <a href="jasurbek.ru">Jasur </a>. All rights reserved.</p>
         </div>
     </div>
 </body>
@@ -153,13 +153,13 @@ EMAIL_TEMPLATE_FOR_WARNINGS = """<!DOCTYPE html>
               <p>Hello,</p>
               <p>The product <strong>{{PRODUCT_NAME}}</strong> is running low in our warehouse stock.</p>
               <p>Please restock it as soon as possible to avoid any interruptions.</p>
-              <a href="https://shaxzodbek.com" class="button">View Inventory</a>
+              <a href="https://jasurbek.ru" class="button">View Inventory</a>
             </td>
           </tr>
           <tr>
             <td class="footer">
               <p>This is an automated message—please do not reply.</p>
-              <p>Questions? Contact us at <a href="mailto:muxtorovshaxzodbek16@gmail.com">muxtorovshaxzodbek16@gmail.com</a>.</p>
+              <p>Questions? Contact us at <a href="mailto:shermatovjasur800@gmail.com">shermatovjasur800@gmail.com</a>.</p>
             </td>
           </tr>
         </table>
